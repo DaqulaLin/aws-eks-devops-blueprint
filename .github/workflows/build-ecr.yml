@@ -1,0 +1,55 @@
+name: build-and-push-ecr
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "apps/myapp/**"
+      - ".github/workflows/build-ecr.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "apps/myapp/**"
+
+permissions:
+  contents: read
+  id-token: write    # OIDC 必须
+  packages: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: myapp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{secrets.AWS_GHA_ECR_ARN}}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG apps/myapp
+          docker tag   $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG $ECR_REGISTRY/${ECR_REPOSITORY}:latest
+          docker push  $ECR_REGISTRY/${ECR_REPOSITORY}:$IMAGE_TAG
+          docker push  $ECR_REGISTRY/${ECR_REPOSITORY}:latest
+          echo $IMAGE_TAG > image-tag.txt
+
+      - name: Upload build artifact (image tag)
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-tag
+          path: image-tag.txt

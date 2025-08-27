@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: staging-admin
+  namespace: staging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ns-admin
+  namespace: staging
+rules:
+- apiGroups: ["", "apps", "batch", "extensions", "autoscaling", "networking.k8s.io"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ns-admin-binding
+  namespace: staging
+subjects:
+- kind: ServiceAccount
+  name: staging-admin
+  namespace: staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ns-admin

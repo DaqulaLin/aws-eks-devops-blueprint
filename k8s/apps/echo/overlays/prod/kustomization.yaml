@@ -1,0 +1,12 @@
+namespace: prod
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: Ingress
+      name: echo
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: echo.prod
+
