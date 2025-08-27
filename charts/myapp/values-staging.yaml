@@ -1,0 +1,6 @@
+replicaCount: 2
+ingress:
+  host: myapp.staging
+resources:
+  requests: { cpu: "100m", memory: "128Mi" }
+  limits:   { cpu: "300m", memory: "512Mi" }

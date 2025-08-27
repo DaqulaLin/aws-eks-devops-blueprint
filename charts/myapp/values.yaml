@@ -1,0 +1,30 @@
+replicaCount: 2
+
+image:
+  repository: "<ECR_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/myapp"
+  tag: "0.1.0"     # CI 会用 --set image.tag=xxxx 注入
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  host: myapp.dev
+  path: /
+  tls: false       # Day 2 验证阶段先不启用 TLS
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "64Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
