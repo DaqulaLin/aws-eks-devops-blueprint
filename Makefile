@@ -39,7 +39,7 @@ refresh:
 
 
 kubeconfig:
-	cd infra/terraform/envs/$(ENV) && aws eks update-kubeconfig --region $(AWS_REGION) --name `terraform output -raw cluster_name`
+	cd infra/terraform/envs/$(ENV) && aws eks update-kubeconfig --region $(AWS_REGION) --name project-eks-dev-eks
 
 awssts:
 	aws sts get-caller-identity

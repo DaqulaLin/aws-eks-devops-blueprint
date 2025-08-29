@@ -13,7 +13,7 @@ service:
 ingress:
   enabled: true
   className: nginx
-  host: myapp.dev
+  host: ""
   path: /
   tls: false       # Day 2 验证阶段先不启用 TLS
 
@@ -28,3 +28,17 @@ resources:
 podDisruptionBudget:
   enabled: true
   minAvailable: 1
+
+serviceAccount:
+  create: true          # 默认创建 SA
+  name: ""              # 为空则用模板里的默认命名
+  automount: true
+  annotations: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  # 建议只开一个指标即可；需要时再打开
+  targetCPUUtilizationPercentage: 60
+  # targetMemoryUtilizationPercentage: 70
