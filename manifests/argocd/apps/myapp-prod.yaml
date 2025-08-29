@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<YOUR_ORG>/<YOUR_REPO>.git
+    repoURL: https://github.com/DaqulaLin/aws-eks-devops-blueprint.git
     targetRevision: main
     path: charts/myapp
     helm:
@@ -14,7 +14,7 @@ spec:
         - values-prod.yaml
       parameters:
         - name: image.repository
-          value: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/myapp
+          value: 160885250897.dkr.ecr.us-east-1.amazonaws.com/myapp
         - name: image.tag
           value: latest
   destination:
