@@ -4,8 +4,12 @@ ENV ?= dev
 init:
 	cd infra/terraform/envs/$(ENV) && terraform init
 
+
 initupgrade:
 	cd infra/terraform/envs/$(ENV) && terraform init -upgrade
+
+initreconfigure:
+	cd infra/terraform/envs/$(ENV) && terraform init -reconfigure
 
 fmt:
 	terraform fmt -recursive
@@ -33,8 +37,6 @@ clustername:
 
 refresh:
 	cd infra/terraform/envs/$(ENV) && terraform apply -refresh-only -var="aws_region=$(AWS_REGION)"
-
-
 
 
 
