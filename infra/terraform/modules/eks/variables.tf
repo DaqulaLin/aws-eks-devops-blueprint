@@ -9,6 +9,11 @@ variable "node_max_size" { type = number }
 variable "tags" { type = map(string) }
 variable "use_public_nodes" { type = bool }
 
+variable "enable_prefix_delegation" {
+  type    = bool
+  default = false
+}
+
 variable "upgrade_policy" {
   description = "EKS 升级策略，STANDARD 或 EXTENDED"
   type = object({

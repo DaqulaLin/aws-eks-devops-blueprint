@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: basic-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: k8s-basic.rules
+    rules:
+    - alert: PodHighRestarts
+      expr: increase(kube_pod_container_status_restarts_total[5m]) > 3
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Pod {{ $labels.pod }} is restarting frequently"
+        description: "Pod {{ $labels.pod }} in ns {{ $labels.namespace }} restarted more than 3 times in 5m."
+    - alert: ContainerHighCPU
+      expr: rate(container_cpu_usage_seconds_total{container!=""}[5m]) > 0.5
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage"
+        description: "Container {{ $labels.container }} CPU > 0.5 cores for 10m (pod {{ $labels.pod }}, ns {{ $labels.namespace }})."
