@@ -12,7 +12,7 @@ initreconfigure:
 	cd infra/terraform/envs/$(ENV) && terraform init -reconfigure
 
 fmt:
-	terraform fmt -recursive
+	cd infra/terraform/envs/$(ENV) && terraform fmt -recursive
 
 validate:
 	cd infra/terraform/envs/$(ENV) && terraform validate
@@ -45,4 +45,9 @@ kubeconfig:
 
 awssts:
 	aws sts get-caller-identity
+
+cd:
+	cd infra/terraform/envs/$(ENV)
+
+
 

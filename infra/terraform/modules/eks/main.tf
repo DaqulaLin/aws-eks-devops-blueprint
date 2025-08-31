@@ -64,6 +64,36 @@ resource "aws_iam_role_policy_attachment" "node_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
+
+
+
+locals {
+  lt_user_data = <<-EOT
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="==BOUNDARY=="
+
+    --==BOUNDARY==
+    Content-Type: text/x-shellscript; charset="us-ascii"
+
+    #!/bin/bash
+    /etc/eks/bootstrap.sh ${aws_eks_cluster.this.name} \
+      --use-max-pods true \
+      --cni-prefix-delegation-enabled ${var.enable_prefix_delegation ? "true" : "false"}
+
+    --==BOUNDARY==--
+  EOT
+}
+
+resource "aws_launch_template" "ng" {
+  name_prefix             = "${var.name_prefix}-ng-"
+  update_default_version  = true
+
+
+  # 关键：multi-part + base64
+  user_data = base64encode(local.lt_user_data)
+}
+
+
 # Managed Node Group
 resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
@@ -78,7 +108,10 @@ resource "aws_eks_node_group" "this" {
     min_size     = var.node_min_size
     max_size     = var.node_max_size
   }
-
+  launch_template {
+    id      = aws_launch_template.ng.id
+    version = "$Latest"
+  }
   update_config { max_unavailable = 1 }
 
   tags = var.tags

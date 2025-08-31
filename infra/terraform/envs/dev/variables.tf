@@ -71,3 +71,5 @@ variable "enable_nat" {
 
 
 variable "oidc_provider_arn" { type = string }
+
+
