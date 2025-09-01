@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://kubernetes.github.io/autoscaler
     chart: cluster-autoscaler
-    targetRevision: 9.29.1                # 对应 CA 1.29.x，可固定具体版本
+    targetRevision: 9.32.*               # 对应 CA 1.29.x，可固定具体版本
     helm:
       values: |
         cloudProvider: aws
@@ -29,9 +29,6 @@ spec:
           skip-nodes-with-local-storage: "false"
           skip-nodes-with-system-pods: "false"
           v: "4"
-
-        image:
-          tag: v1.29.0
 
         rbac:
           create: true
