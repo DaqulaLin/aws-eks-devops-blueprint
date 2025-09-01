@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-autoscaler
+  namespace: argocd
+  finalizers: [resources-finalizer.argocd.argoproj.io]
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes.github.io/autoscaler
+    chart: cluster-autoscaler
+    targetRevision: 9.*                 # 对应 CA 1.29.x，可固定具体版本
+    helm:
+      values: |
+        cloudProvider: aws
+        awsRegion: us-east-1
+        autoDiscovery:
+          clusterName: <你的集群名>
+        serviceAccount:
+          create: true
+          name: cluster-autoscaler
+          annotations:
+            eks.amazonaws.com/role-arn: <module.ca_irsa.role_arn><你的IRSA Role ARN>
+
+        extraArgs:
+          balance-similar-node-groups: "true"
+          skip-nodes-with-local-storage: "false"
+          skip-nodes-with-system-pods: "false"
+          stderrthreshold: info
+          v: "4"
+
+        image:
+          tag: v1.29.0
+
+        resources:
+          limits:   { cpu: 200m, memory: 300Mi }
+          requests: { cpu: 100m, memory: 200Mi }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

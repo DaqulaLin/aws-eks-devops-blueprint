@@ -1,0 +1,73 @@
+deploymentMode: SingleBinary
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 20Gi
+    # storageClass: gp3   # 需要时再打开
+
+# 不是分布式模式，显式关掉（有这个段就写，没有也没关系）
+simpleScalable:
+  enabled: false
+read: { replicas: 0 }
+write: { replicas: 0 }
+backend: { replicas: 0 }
+
+loki:
+  # 这段是 chart 级别需要的最小 storage 描述，防止访问 bucketNames 报空
+  storage:
+    type: filesystem
+    filesystem:
+      directory: /var/loki/chunks
+    bucketNames:
+      chunks: loki-chunks
+      ruler: loki-ruler
+      admin: loki-admin
+
+  # （可选）给 Ruler 指定本地存储目录，和上面保持一致
+  ruler:
+    storage:
+      type: local
+      local:
+        directory: /var/loki/rules
+
+  # Loki 的真实配置——结构化形式，避免字符串再渲染造成解析问题
+  structuredConfig:
+    auth_enabled: false
+    server:
+      http_listen_port: 3100
+    common:
+      path_prefix: /var/loki
+      replication_factor: 1
+
+    memberlist:
+      join_members:
+        - loki-memberlist
+
+    schema_config:
+      configs:
+        - from: "2024-01-01"      # 一定早于当前日期
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+
+    storage_config:
+      boltdb_shipper:
+        shared_store: filesystem
+        active_index_directory: /var/loki/index
+        cache_location: /var/loki/boltdb-cache
+      filesystem:
+        directory: /var/loki/chunks
+
+    compactor:
+      working_directory: /var/loki/compactor
+      shared_store: filesystem
+      compaction_interval: 10m
+      retention_enabled: true
+
+    limits_config:
+      retention_period: 168h

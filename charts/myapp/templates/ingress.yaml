@@ -4,7 +4,10 @@ kind: Ingress
 metadata:
   name: {{ include "myapp.fullname" . }}
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "{{ ternary "true" "false" .Values.ingress.tls }}"
+#    nginx.ingress.kubernetes.io/ssl-redirect: "{{ ternary "true" "false" .Values.ingress.tls }}"
+    {{- with .Values.ingress.extraAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className | default "nginx" }}
   rules:

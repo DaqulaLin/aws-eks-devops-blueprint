@@ -11,7 +11,10 @@ variable "use_public_nodes" { type = bool }
 
 variable "enable_prefix_delegation" {
   type    = bool
-  default = false
+}
+
+variable "enable_vpc_cni_addon" {
+  type    = bool
 }
 
 variable "upgrade_policy" {

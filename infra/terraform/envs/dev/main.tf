@@ -19,18 +19,20 @@ module "vpc" {
 
 
 module "eks" {
-  source              = "../../modules/eks"
-  name_prefix         = local.name_prefix
-  eks_version         = var.eks_version
-  private_subnet_ids  = module.vpc.private_subnet_ids
-  public_subnet_ids   = module.vpc.public_subnet_ids
-  use_public_nodes    = var.use_public_nodes
-  node_instance_types = var.node_instance_types
-  node_desired_size   = var.node_desired_size
-  node_min_size       = var.node_min_size
-  node_max_size       = var.node_max_size
-  upgrade_policy      = { support_type = "STANDARD" }
-  tags                = local.tags
+  source                   = "../../modules/eks"
+  name_prefix              = local.name_prefix
+  eks_version              = var.eks_version
+  private_subnet_ids       = module.vpc.private_subnet_ids
+  public_subnet_ids        = module.vpc.public_subnet_ids
+  use_public_nodes         = var.use_public_nodes
+  node_instance_types      = var.node_instance_types
+  node_desired_size        = var.node_desired_size
+  node_min_size            = var.node_min_size
+  node_max_size            = var.node_max_size
+  upgrade_policy           = { support_type = "STANDARD" }
+  enable_prefix_delegation = var.enable_prefix_delegation
+  enable_vpc_cni_addon     = var.enable_vpc_cni_addon
+  tags                     = local.tags
 
 }
 
@@ -70,3 +72,12 @@ module "gha_oidc_ecr" {
 
 }
 
+
+module "ca_irsa" {
+  source               = "../../modules/ca-irsa"
+  cluster_name         = module.eks.cluster_name
+  oidc_issuer_url      = module.eks.oidc_issuer
+  namespace            = "kube-system"
+  service_account_name = "cluster-autoscaler"
+
+}

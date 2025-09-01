@@ -17,7 +17,7 @@ variable "minimum_ip_target" {
 }
 variable "external_snat" {
   type    = bool
-  default = true
+  default = false #关键：由节点做 SNAT（你当前公有子网+公网IP场景）,若用私有子网+NAT网关则改true
 }
 
 locals {

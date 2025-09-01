@@ -79,7 +79,6 @@ locals {
     /etc/eks/bootstrap.sh ${aws_eks_cluster.this.name} \
       --use-max-pods true \
       --cni-prefix-delegation-enabled ${var.enable_prefix_delegation ? "true" : "false"}
-
     --==BOUNDARY==--
   EOT
 }
@@ -114,7 +113,13 @@ resource "aws_eks_node_group" "this" {
   }
   update_config { max_unavailable = 1 }
 
-  tags = var.tags
+  tags = merge(
+    var.tags,
+    {
+       "k8s.io/cluster-autoscaler/enabled"                       = "true"
+       "k8s.io/cluster-autoscaler/${aws_eks_cluster.this.name}"  = "owned"
+    }
+  )    
 
   depends_on = [
     aws_iam_role_policy_attachment.node_AmazonEKSWorkerNodePolicy,
