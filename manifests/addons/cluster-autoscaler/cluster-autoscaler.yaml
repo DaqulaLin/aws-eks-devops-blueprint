@@ -18,7 +18,7 @@ spec:
           clusterName: project-eks-dev-eks
         serviceAccount:
           create: true
-          name: cluster-autoscaler
+          name: cluster-autoscaler-aws-cluster-autoscaler
           annotations:
             eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
 
