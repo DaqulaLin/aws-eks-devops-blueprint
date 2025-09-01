@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://kubernetes.github.io/autoscaler
     chart: cluster-autoscaler
-    targetRevision: 9.32.0              # 对应 CA 1.29.x，可固定具体版本
+    targetRevision: 9.32.0      
     helm:
       values: |
         cloudProvider: aws
@@ -23,9 +23,6 @@ spec:
             eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
 
         extraArgs:
-          cloud-provider: "aws"
-          aws-region: "us-east-1"
-          node-group-auto-discovery: "asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/project-eks-dev-eks"
           address: "0.0.0.0"
           balance-similar-node-groups: "true"
           skip-nodes-with-local-storage: "false"
@@ -34,7 +31,7 @@ spec:
 
         image:
           repository: registry.k8s.io/autoscaling/cluster-autoscaler
-          tag: v1.32.0  
+          tag: v1.32.2 
 
         rbac:
           create: true
