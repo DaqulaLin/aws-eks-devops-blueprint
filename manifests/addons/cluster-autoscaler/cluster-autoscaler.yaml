@@ -16,11 +16,14 @@ spec:
         awsRegion: us-east-1
         autoDiscovery:
           clusterName: project-eks-dev-eks
-        serviceAccount:
+
+        rbac:
           create: true
-          name: cluster-autoscaler
-          annotations:
-            eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
+          serviceAccount:
+            create: true
+            name: cluster-autoscaler
+            annotations:
+              eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
 
         extraArgs:
           address: "0.0.0.0"
@@ -33,8 +36,7 @@ spec:
           repository: registry.k8s.io/autoscaling/cluster-autoscaler
           tag: v1.32.2 
 
-        rbac:
-          create: true
+
 
         podAnnotations:
           cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
