@@ -22,15 +22,15 @@ spec:
           annotations:
             eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
 
-        customArgs:
-          - --cloud-provider=aws
-          - --aws-region=us-east-1
-          - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/project-eks-dev-eks
-          - --address=0.0.0.0
-          - --balance-similar-node-groups=true
-          - --skip-nodes-with-local-storage=false
-          - --skip-nodes-with-system-pods=false
-          - --v=4
+        extraArgs:
+          cloud-provider: "aws"
+          aws-region: "us-east-1"
+          node-group-auto-discovery: "asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/project-eks-dev-eks"
+          address: "0.0.0.0"
+          balance-similar-node-groups: "true"
+          skip-nodes-with-local-storage: "false"
+          skip-nodes-with-system-pods: "false"
+          v: "4"
 
         image:
           repository: registry.k8s.io/autoscaling/cluster-autoscaler
