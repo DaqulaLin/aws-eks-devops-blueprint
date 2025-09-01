@@ -23,7 +23,8 @@ spec:
             eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
 
         extraArgs:
-          address: ":8085"
+          address: "0.0.0.0"
+          port: "8085" 
           balance-similar-node-groups: "true"
           skip-nodes-with-local-storage: "false"
           skip-nodes-with-system-pods: "false"
