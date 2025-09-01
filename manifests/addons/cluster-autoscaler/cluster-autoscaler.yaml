@@ -15,22 +15,25 @@ spec:
         cloudProvider: aws
         awsRegion: us-east-1
         autoDiscovery:
-          clusterName: <你的集群名>
+          clusterName: project-eks-dev-eks
         serviceAccount:
           create: true
           name: cluster-autoscaler
           annotations:
-            eks.amazonaws.com/role-arn: <module.ca_irsa.role_arn><你的IRSA Role ARN>
+            eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-ClusterAutoscaler
 
         extraArgs:
+          address: ":8085"
           balance-similar-node-groups: "true"
           skip-nodes-with-local-storage: "false"
           skip-nodes-with-system-pods: "false"
-          stderrthreshold: info
           v: "4"
 
         image:
           tag: v1.29.0
+
+        podAnnotations:
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 
         resources:
           limits:   { cpu: 200m, memory: 300Mi }
