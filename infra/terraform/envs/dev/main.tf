@@ -94,3 +94,21 @@ module "gitlab_runner_irsa" {
   ecr_repository_name = "myapp"
   scope_to_repo       = true
 }
+
+module "jenkins_agent_irsa" {
+  source               = "../../modules/jenkins-agent-irsa"
+  cluster_name         = module.eks.cluster_name
+  oidc_issuer          = module.eks.oidc_issuer # 形如 https://oidc.eks.us-east-1.amazonaws.com/id/xxxx
+  namespace            = "jenkins"
+  service_account_name = "jenkins-agent"
+  tags                 = var.tags
+  # include_aud_condition = true  # 若你之前遇到 aud 兼容问题，可设为 false 试下
+}
+
+module "ebs_csi_addon" {
+  source       = "../../modules/ebs-csi-addon"
+  cluster_name = module.eks.cluster_name    # 你的 EKS 模块输出
+  k8s_version  = module.eks.cluster_version            # 可选，选个匹配的版本
+  oidc_issuer  = module.eks.oidc_issuer     # 你的 EKS 模块输出
+  tags         = var.tags
+}

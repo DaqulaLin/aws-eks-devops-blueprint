@@ -69,6 +69,17 @@ variable "enable_nat" {
 }
 
 
+variable "tags" {
+  description = "Common tags applied to all resources"
+  type        = map(string)
+  default = {
+    Project     = "project-eks"
+    Environment = "dev"
+    ManagedBy   = "terraform"
+  }
+}
+
+
 
 variable "oidc_provider_arn" { type = string }
 

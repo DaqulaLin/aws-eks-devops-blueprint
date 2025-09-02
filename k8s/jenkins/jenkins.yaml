@@ -1,0 +1,62 @@
+controller:
+  admin:
+    existingSecret: jenkins-admin
+
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator           # Pipeline
+    - git
+    - gitlab-plugin                 # 可用 GitLab Webhook/多分支
+    - configuration-as-code
+  ingress:
+    enabled: true
+    hostName: jenkins.dev
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+  persistence:
+    enabled: true
+    storageClass: gp3          # 若你已有默认 SC，也可置空："" 使用默认
+    accessMode: ReadWriteOnce
+    size: 5Gi                 # 可按需调整
+
+  # ★ 避免卷权限问题
+  volumePermissions:
+    enabled: true
+
+  JCasC:
+    defaultConfig: true
+    configScripts:
+      k8s-cloud: |
+        jenkins:
+          clouds:
+          - kubernetes:
+              name: "kubernetes"
+              namespace: "jenkins"
+              serverUrl: "https://kubernetes.default.svc"
+              jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+              jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
+              containerCapStr: "10"
+              templates:
+                - name: "kaniko-template"
+                  namespace: "jenkins"
+                  serviceAccount: "jenkins-agent"
+                  label: "k8s-kaniko"
+                  yaml: |
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      serviceAccountName: jenkins-agent
+                      containers:
+                        - name: jnlp
+                          image: jenkins/inbound-agent:alpine-jdk17
+                          args: [ "$(JENKINS_SECRET)", "$(JENKINS_NAME)" ]
+                        - name: kaniko
+                          image: gcr.io/kaniko-project/executor:latest
+                          command: [ "cat" ]
+                          tty: true
+                        - name: tools
+                          image: alpine:3.20
+                          command: [ "cat" ]
+                          tty: true
