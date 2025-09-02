@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-staging
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://gitlab.com/lintime0223/project-eks.git
+    targetRevision: main
+    path: charts/myapp
+    helm:
+      valueFiles:
+        - values-staging.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
