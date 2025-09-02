@@ -1,6 +1,8 @@
 pipeline {
   agent {
     kubernetes {
+      cloud 'kubernetes' // ←修改为你的
+      inheritFrom 'kaniko-template' // ←修改为你的
       label 'k8s-kaniko'
       defaultContainer 'jnlp'
     }
@@ -9,7 +11,7 @@ pipeline {
   environment {
     AWS_REGION     = 'us-east-1'
     ACCOUNT_ID     = credentials('git-push-token') // 可选：若你习惯做成凭据；也可直接写死
-    ECR_REGISTRY   = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    ECR_REGISTRY   = "160885250897.dkr.ecr.us-east-1.amazonaws.com"
     ECR_REPOSITORY = 'myapp'
     IMAGE_TAG      = "${env.GIT_COMMIT.take(7)}"
     // 你的 GitLab 仓库（https 方式）
