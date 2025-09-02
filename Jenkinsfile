@@ -8,7 +8,7 @@ pipeline {
 
   environment {
     AWS_REGION     = 'us-east-1'
-    ACCOUNT_ID     = credentials('aws-account-id') // 可选：若你习惯做成凭据；也可直接写死
+    ACCOUNT_ID     = credentials('git-push-token') // 可选：若你习惯做成凭据；也可直接写死
     ECR_REGISTRY   = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     ECR_REPOSITORY = 'myapp'
     IMAGE_TAG      = "${env.GIT_COMMIT.take(7)}"
