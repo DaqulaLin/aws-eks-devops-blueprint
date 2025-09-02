@@ -13,7 +13,7 @@ build:image:
   stage: build
   tags: [ "eks" ]
   image:
-    name: gcr.io/kaniko-project/executor:latest
+    name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
     - echo "Building & pushing ${IMAGE}"
