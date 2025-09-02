@@ -47,5 +47,5 @@ bump:values-dev:
     # 将 dev 环境的 image.tag 更新为本次构建的短 SHA
     - yq -i ".image.tag = \"${IMAGE_TAG}\"" charts/myapp/values-dev.yaml
     - git add charts/myapp/values-dev.yaml
-    - git commit -m "ci: bump dev image.tag -> ${IMAGE_TAG} [skip ci]" || echo "no changes"
+    - git commit -m "ci: bump dev image.tag -> ${IMAGE_TAG} [skip ci]" 
     - git push https://oauth2:${GIT_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git "${CI_COMMIT_REF_NAME}"
