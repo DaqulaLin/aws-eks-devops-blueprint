@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://gitlab.com/lintime0223/project-eks.git
     targetRevision: main
-    path: manifests/argocd/apps
+    path: manifests/gitlab/apps
     directory:
       recurse: true
   destination:
