@@ -19,10 +19,13 @@ runners:
   locked: false
   requestConcurrency: 2
   executor: kubernetes
-  serviceAccountName: gitlab-runner
-  privileged: false          # 我们用 Kaniko，无需特权
-  podAnnotations:
-    iam.amazonaws.com/role: ""   # 不用旧注解，留空
+  kubernetes:
+    namespace: ci                    # 可省略；默认就是安装命名空间
+    serviceAccountName: gitlab-runner
+    privileged: false                # Kaniko 不需要特权
+    pollTimeout: 180
+    podAnnotations:
+      iam.amazonaws.com/role: ""   # 不用旧注解，留空
   builds:
     cpuLimit: 1000m
     memoryLimit: 1Gi
