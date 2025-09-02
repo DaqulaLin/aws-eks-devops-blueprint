@@ -1,0 +1,51 @@
+stages: [build, bump]
+
+variables:
+  DOCKER_HOST: tcp://localhost:2375
+  AWS_REGION: ${AWS_REGION}
+  ECR_REGISTRY: ${ECR_REGISTRY}
+  ECR_REPOSITORY: ${ECR_REPOSITORY}
+  IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
+  IMAGE: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+  # Kaniko 读取默认的 IRSA 环境变量，无需 AK/SK
+
+build:image:
+  stage: build
+  tags: [ "eks" ]
+  image:
+    name: gcr.io/kaniko-project/executor:latest
+    entrypoint: [""]
+  script:
+    - echo "Building & pushing ${IMAGE}"
+    - >
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}/apps/myapp"
+      --dockerfile "${CI_PROJECT_DIR}/apps/myapp/Dockerfile"
+      --destination "${IMAGE}"
+      --destination "${ECR_REGISTRY}/${ECR_REPOSITORY}:gitlab-${CI_COMMIT_SHORT_SHA}"
+      --snapshotMode=redo
+      --use-new-run
+  artifacts:
+    reports:
+      dotenv: build.env
+  after_script:
+    - echo "IMAGE_TAG=${IMAGE_TAG}" > build.env
+
+bump:values-dev:
+  stage: bump
+  tags: [ "eks" ]
+  image: alpine:3.20
+  needs: [ "build:image" ]
+  before_script:
+    - apk add --no-cache git yq
+    - git config user.email "ci@yourcorp.local"
+    - git config user.name  "gitlab-ci"
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - git remote set-url origin "${GIT_REPO_HTTP}"
+    - git checkout -B "${CI_COMMIT_REF_NAME}"
+  script:
+    # 将 dev 环境的 image.tag 更新为本次构建的短 SHA
+    - yq -i ".image.tag = \"${IMAGE_TAG}\"" charts/myapp/values-dev.yaml
+    - git add charts/myapp/values-dev.yaml
+    - git commit -m "ci: bump dev image.tag -> ${IMAGE_TAG} [skip ci]" || echo "no changes"
+    - git push https://oauth2:${GIT_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git "${CI_COMMIT_REF_NAME}"

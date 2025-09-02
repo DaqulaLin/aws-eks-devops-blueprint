@@ -78,7 +78,7 @@ locals {
     #!/bin/bash
     /etc/eks/bootstrap.sh ${aws_eks_cluster.this.name} \
       --use-max-pods true \
-      --cni-prefix-delegation-enabled ${var.enable_prefix_delegation ? "true" : "false"}
+      --cni-prefix-delegation-enabled ${var.enable_prefix_delegation}
     --==BOUNDARY==--
   EOT
 }
@@ -86,10 +86,7 @@ locals {
 resource "aws_launch_template" "ng" {
   name_prefix             = "${var.name_prefix}-ng-"
   update_default_version  = true
-
-
-  # 关键：multi-part + base64
-  user_data = base64encode(local.lt_user_data)
+  user_data = base64encode(local.lt_user_data)   # 关键：multi-part + base64
 }
 
 
@@ -111,6 +108,7 @@ resource "aws_eks_node_group" "this" {
     id      = aws_launch_template.ng.id
     version = "$Latest"
   }
+  force_update_version = true
   update_config { max_unavailable = 1 }
 
   tags = merge(

@@ -74,10 +74,23 @@ module "gha_oidc_ecr" {
 
 
 module "ca_irsa" {
-  source               = "../../modules/ca-irsa"
+  source               = "../../modules/cluster-autoscaler-irsa"
   cluster_name         = module.eks.cluster_name
   oidc_issuer_url      = module.eks.oidc_issuer
   namespace            = "kube-system"
   service_account_name = "cluster-autoscaler"
 
+}
+
+
+module "gitlab_runner_irsa" {
+  source               = "../../modules/gitlab-runner-irsa"
+  cluster_name         = module.eks.cluster_name
+  oidc_issuer          = module.eks.oidc_issuer
+  namespace            = "ci"
+  service_account_name = "gitlab-runner"
+
+  aws_region          = "us-east-1"
+  ecr_repository_name = "myapp"
+  scope_to_repo       = true
 }

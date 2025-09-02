@@ -1,0 +1,37 @@
+gitlabUrl: https://gitlab.com/
+unregisterRunners: true
+rbac:
+  create: true
+serviceAccount:
+  create: true
+  name: gitlab-runner
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::160885250897:role/project-eks-dev-eks-GitLabRunnerECR   # 替换为上一步 ROLE_ARN
+runnerRegistrationToken: "glrt-uGN2-9rDf8QU9mRZp_s72286MQpwOjE4NDdhcwp0OjMKdTpodjg2cxg.01.1j0nd7bvn"     # 走 Secret
+envVars:
+  - name: AWS_REGION
+    value: us-east-1
+  - name: DOCKER_CONFIG
+    value: /kaniko/.docker/   # Kaniko 用不到登录也行，这里保留占位
+runners:
+  name: "eks-shared-runner"
+  tags: "eks"
+  locked: false
+  requestConcurrency: 2
+  executor: kubernetes
+  serviceAccountName: gitlab-runner
+  privileged: false          # 我们用 Kaniko，无需特权
+  podAnnotations:
+    iam.amazonaws.com/role: ""   # 不用旧注解，留空
+  builds:
+    cpuLimit: 1000m
+    memoryLimit: 1Gi
+  helpers:
+    image: registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-latest
+  cache:
+    cacheType: emptyDir
+useTolerations: false
+## 通过 existing secret 读取 token
+#secrets:
+#  - name: runner-registration-token
+#    secretName: gitlab-runner-secret
