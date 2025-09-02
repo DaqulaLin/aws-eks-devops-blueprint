@@ -19,18 +19,18 @@ runners:
   locked: false
   requestConcurrency: 2
   executor: kubernetes
-  kubernetes:
-    namespace: ci                    # 可省略；默认就是安装命名空间
-    serviceAccountName: gitlab-runner
-    privileged: false                # Kaniko 不需要特权
-    pollTimeout: 180
-    podAnnotations:
-      iam.amazonaws.com/role: ""   # 不用旧注解，留空
+  config: |
+    [[runners]]
+      name = "eks-shared-runner"
+      executor = "kubernetes"
+      [runners.kubernetes]
+        namespace = "ci"
+        service_account = "gitlab-runner"
+        privileged = false
+        poll_timeout = 180
   builds:
     cpuLimit: 1000m
     memoryLimit: 1Gi
-  helpers:
-    image: registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-latest
   cache:
     cacheType: emptyDir
 useTolerations: false
