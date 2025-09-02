@@ -13,7 +13,7 @@ pipeline {
     ECR_REPOSITORY = 'myapp'
     IMAGE_TAG      = "${env.GIT_COMMIT.take(7)}"
     // 你的 GitLab 仓库（https 方式）
-    GIT_HTTP       = "https://gitlab.com/<NAMESPACE>/<REPO>.git"  // ←修改为你的
+    GIT_HTTP       = "https://gitlab.com/lintime0223/project-eks.git"  // ←修改为你的
   }
 
   stages {
@@ -64,5 +64,5 @@ pipeline {
     }
   }
 
-  options { timestamps() }
+  //options { timestamps() }
 }
