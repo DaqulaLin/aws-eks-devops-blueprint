@@ -47,4 +47,4 @@ bump:alues-dev:
     - yq -i ".image.tag = \"${IMAGE_TAG}\"" charts/myapp/values-dev.yaml
     - git add charts/myapp/values-dev.yaml
     - git commit -m "ci:bump dev image.tag -> ${IMAGE_TAG} [skip ci]" || echo "no changes" 
-    - git push https://oauth2:${GIT_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git "${CI_COMMIT_REF_NAME}"
+    - git push origin HEAD:${CI_COMMIT_REF_NAME}
