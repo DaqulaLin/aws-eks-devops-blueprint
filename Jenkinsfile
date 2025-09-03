@@ -41,26 +41,28 @@ pipeline {
     stage('Bump values-dev & Push') {
       steps {
         container('tools') {
-          withCredentials([string(credentialsId: 'git-push-token', variable: 'GIT_PUSH_TOKEN')]) {
-            sh '''
-            apk add --no-cache git yq
+          dir("${env.WORKSPACE}") {
+            withCredentials([string(credentialsId: 'git-push-token', variable: 'GIT_PUSH_TOKEN')]) {
+              sh '''
+              apk add --no-cache git yq
 
-            git config user.email "jenkins@yourcorp.local"
-            git config user.name  "jenkins"
+              git config user.email "jenkins@yourcorp.local"
+              git config user.name  "jenkins"
 
-            # 更新镜像 tag
-            yq -i '.image.tag = env(IMAGE_TAG)' charts/myapp/values-dev.yaml
+              # 更新镜像 tag
+              yq -i '.image.tag = env(IMAGE_TAG)' charts/myapp/values-dev.yaml
 
-            git add charts/myapp/values-dev.yaml
-            git commit -m "ci(jenkins): bump dev image.tag -> $IMAGE_TAG [skip ci]" || true
+              git add charts/myapp/values-dev.yaml
+              git commit -m "ci(jenkins): bump dev image.tag -> $IMAGE_TAG [skip ci]" || true
 
-            BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+              BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
-            # 用 token 改写 remote 再推送
-            git remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@${GIT_HTTP#https://}"
-            git push origin "HEAD:${BRANCH}"
-            '''
-          }
+              # 用 token 改写 remote 再推送
+              git remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@${GIT_HTTP#https://}"
+              git push origin "HEAD:${BRANCH}"
+              '''
+            }
+          }  
         }
       }
     }
