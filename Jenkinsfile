@@ -19,6 +19,33 @@ pipeline {
   }
 
   stages {
+    stage('Guard (anti-loop)') {
+      steps {
+        container('tools') {
+          script {
+            // 计算是否跳过（1=跳过，0=不跳过）
+            env.SKIP_BUILD = (
+              sh(returnStatus: true, script: """
+                set -eo pipefail
+                REPO="\$WORKSPACE"
+                git config --global --add safe.directory "\$REPO"
+                MSG=\$(git -C "\$REPO" log -1 --pretty=%B    || true)
+                AUTHOR=\$(git -C "\$REPO" log -1 --pretty=%ae || true)
+                echo "last commit: \$AUTHOR :: \$MSG"
+                if echo "\$MSG" | grep -Ei '\\[(skip ci|ci skip)\\]' || echo "\$AUTHOR" | grep -qi '${CI_BOT_EMAIL}'; then
+                  exit 0   # 命中条件：应跳过
+                else
+                  exit 1   # 不跳过
+                fi
+              """) == 0 ? '1' : '0'
+            )
+          }
+        }
+      }
+    }
+
+
+  stages {
     stage('Checkout') {
       steps { checkout scm }
     }
