@@ -70,7 +70,7 @@ pipeline {
 
               # ③ 用 token 改远端并推送（写死仓库 URL 最稳）
               git -C "$REPO" remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@gitlab.com/lintime0223/project-eks.git"
-              git -C "$REPO" push origin -u gitlab HEAD:refs/heads/"$BR"
+              git -C "$REPO" push origin HEAD:refs/heads/"$BR"
             '''
           }
           
