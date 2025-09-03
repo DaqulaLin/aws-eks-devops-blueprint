@@ -91,5 +91,5 @@ pipeline {
   // skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
    // disableConcurrentBuilds()  
     //timestamps() 
-    }
+    //}
 }
