@@ -18,4 +18,4 @@ ingress:
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
     nginx.ingress.kubernetes.io/limit-exempt: "127.0.0.1"
 image:
-  tag: 3787435
+  tag: 190dda9
