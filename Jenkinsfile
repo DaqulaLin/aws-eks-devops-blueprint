@@ -20,43 +20,6 @@ pipeline {
 
    
   stages {
-
-    stage('Guard (anti-loop)') {
-      steps {
-        container('tools') {
-          script {
-            def shouldSkip = (sh(
-              returnStatus: true,
-              script: '''
-                set -e
-                REPO="$WORKSPACE"
-                git config --global --add safe.directory "$REPO" || true
-
-                # 识别目标分支（优先 Jenkins BRANCH_NAME，其次远端默认分支，兜底 main）
-                BR="${BRANCH_NAME:-}"
-                if [ -z "$BR" ] || [ "$BR" = "HEAD" ]; then
-                  BR="$(git -C "$REPO" remote show origin | awk "/HEAD branch/ {print \\$NF}")" || true
-                fi
-                : "${BR:=main}"
-
-                # 拉远端，直接读取 origin/BR 的最新提交（不是本地 HEAD）
-                git -C "$REPO" fetch --no-tags origin "$BR"
-                MSG="$(git -C "$REPO" log -1 --pretty=%B "origin/${BR}" 2>/dev/null || true)"
-                AUTHOR="$(git -C "$REPO" log -1 --pretty=%ae "origin/${BR}" 2>/dev/null || true)"
-
-                # 命中任一条件 => 退出码 0（应跳过），否则 1（继续执行）
-                if echo "$MSG" | grep -Eq '\\[(skip ci|ci skip)\\]'; then exit 0; fi
-                if echo "$AUTHOR" | grep -qi 'jenkins@yourcorp.local'; then exit 0; fi
-                exit 1
-              '''
-            ) == 0)
-            env.SKIP_BUILD = shouldSkip ? '1' : '0'
-            echo "SKIP_BUILD=${env.SKIP_BUILD}"
-          }
-        }
-      }
-    }
-  
     stage('Checkout') {
       steps { checkout scm }
     }
@@ -99,23 +62,23 @@ pipeline {
               git -C "$REPO" config user.name  "jenkins"
 
               # ② 写入新 tag
+              echo "before: $(yq '.image.tag' "$REPO/charts/myapp/values-dev.yaml" || true)"
               yq -i '.image.tag = env(IMAGE_TAG)' "$REPO/charts/myapp/values-dev.yaml"
+              echo "after : $(yq '.image.tag' "$REPO/charts/myapp/values-dev.yaml")"
 
+              # 提交并展示 diff（保证真的有改动）
               git -C "$REPO" add charts/myapp/values-dev.yaml
+              git -C "$REPO" diff --cached --color=always || true
               git -C "$REPO" commit -m "ci(jenkins): bump dev image.tag -> ${IMAGE_TAG} [skip ci]" || true
 
               
-              # 计算目标分支名：优先 Jenkins 的 BRANCH_NAME；否则取远端默认分支；再兜底 main
-              BR="${BRANCH_NAME:-}"
-              if [ -z "$BR" ] || [ "$BR" = "HEAD" ]; then
-                BR="$(git -C "$REPO" remote show origin | awk "/HEAD branch/ {print \\$NF}")" || true
-              fi
-              : "${BR:=main}"
-              echo "Will push to branch: ${BR}"
 
               # ③ 用 token 改远端并推送（写死仓库 URL 最稳）
               git -C "$REPO" remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@gitlab.com/lintime0223/project-eks.git"
-              git -C "$REPO" push origin HEAD:refs/heads/"$BR"
+              git -C "$REPO" push origin HEAD:refs/heads/main
+
+              # 打印最后一次提交及文件名，方便核对 ARGOCD
+              git -C "$REPO" log -1 --name-status
             '''
           }
           
@@ -124,9 +87,9 @@ pipeline {
     }
   }
 
-  options {
-    skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
-    disableConcurrentBuilds()  
+//  options {
+  // skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
+   // disableConcurrentBuilds()  
     //timestamps() 
     }
 }
