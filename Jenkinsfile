@@ -41,30 +41,34 @@ pipeline {
     stage('Bump values-dev & Push') {
       steps {
         container('tools') {
-          dir("${env.WORKSPACE}") {
-            checkout scm
-            
-            withCredentials([string(credentialsId: 'git-push-token', variable: 'GIT_PUSH_TOKEN')]) {
-              sh '''
-              apk add --no-cache git yq
+          withCredentials([string(credentialsId: 'git-push-token', variable: 'GIT_PUSH_TOKEN')]) {
+            sh '''
+              set -euo pipefail
+              REPO="$WORKSPACE"
+              echo "PWD=$(pwd)"; echo "REPO=$REPO"
+              ls -la "$REPO" | head || true
 
-              git config user.email "jenkins@yourcorp.local"
-              git config user.name  "jenkins"
+              # 工具
+              apk add --no-cache yq
 
-              # 更新镜像 tag
-              yq -i '.image.tag = env(IMAGE_TAG)' charts/myapp/values-dev.yaml
+              # ① 所有 git 都加 -C "$REPO"，强制在仓库根目录操作
+              git -C "$REPO" config user.email "jenkins@yourcorp.local"
+              git -C "$REPO" config user.name  "jenkins"
 
-              git add charts/myapp/values-dev.yaml
-              git commit -m "ci(jenkins): bump dev image.tag -> $IMAGE_TAG [skip ci]" || true
+              # ② 写入新 tag
+              yq -i '.image.tag = env(IMAGE_TAG)' "$REPO/charts/myapp/values-dev.yaml"
 
-              BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+              git -C "$REPO" add charts/myapp/values-dev.yaml
+              git -C "$REPO" commit -m "ci(jenkins): bump dev image.tag -> ${IMAGE_TAG} [skip ci]" || true
 
-              # 用 token 改写 remote 再推送
-              git remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@${GIT_HTTP#https://}"
-              git push origin "HEAD:${BRANCH}"
-              '''
-            }
-          }  
+              BRANCH=$(git -C "$REPO" rev-parse --abbrev-ref HEAD)
+
+              # ③ 用 token 改远端并推送（写死仓库 URL 最稳）
+              git -C "$REPO" remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@gitlab.com/lintime0223/project-eks.git"
+              git -C "$REPO" push origin "HEAD:${BRANCH}"
+            '''
+          }
+          
         }
       }
     }
