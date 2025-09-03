@@ -25,6 +25,9 @@ pipeline {
     }
 
     stage('Build & Push (Kaniko)') {
+        when {
+          not { changelog '.*\\[(skip ci|ci skip)\\].*' }   // 提交信息含 [skip ci] 则跳过
+      }
       steps {
         container('kaniko') {
           sh '''
@@ -40,6 +43,9 @@ pipeline {
     }
 
     stage('Bump values-dev & Push') {
+        when {
+          not { changelog '.*\\[(skip ci|ci skip)\\].*' }   // 提交信息含 [skip ci] 则跳过
+        }
       steps {
         container('tools') {
           withCredentials([string(credentialsId: 'git-push-token', variable: 'GIT_PUSH_TOKEN')]) {
@@ -87,9 +93,9 @@ pipeline {
     }
   }
 
-//  options {
-  // skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
-   // disableConcurrentBuilds()  
+  options {
+    skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
+    disableConcurrentBuilds()  
     //timestamps() 
-    //}
+  }
 }
