@@ -18,7 +18,11 @@ pipeline {
     GIT_HTTP       = "https://gitlab.com/lintime0223/project-eks.git"  // ←修改为你的
   }
 
-
+  options {
+    skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
+    disableConcurrentBuilds()  
+    //timestamps() 
+  }
    
   stages {
     stage('Checkout') {
@@ -39,14 +43,10 @@ pipeline {
       }
     }
 
-    options {
-      skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
-      disableConcurrentBuilds()  
-      //timestamps() 
-    }
+
 
     stage('Build & Push (Kaniko)') {
-        when {
+      when {
           not { changelog '.*\\[(skip ci|ci skip)\\].*' }   // 提交信息含 [skip ci] 则跳过
       }
       steps {
