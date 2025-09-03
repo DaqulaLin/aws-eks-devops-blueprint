@@ -43,7 +43,7 @@ pipeline {
         }
       }
     }
-
+  }
 
   stages {
     stage('Checkout') {
