@@ -42,6 +42,8 @@ pipeline {
       steps {
         container('tools') {
           dir("${env.WORKSPACE}") {
+            checkout scm
+            
             withCredentials([string(credentialsId: 'git-push-token', variable: 'GIT_PUSH_TOKEN')]) {
               sh '''
               apk add --no-cache git yq
