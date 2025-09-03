@@ -45,11 +45,16 @@ pipeline {
             sh '''
               set -euo pipefail
               REPO="$WORKSPACE"
+
               echo "PWD=$(pwd)"; echo "REPO=$REPO"
               ls -la "$REPO" | head || true
 
               # 工具
               apk add --no-cache yq
+
+              # 关键修复：允许以 root 操作由 uid=1000 检出的仓库
+              git config --global --add safe.directory "$REPO"
+              #（更省事也可用：git config --global --add safe.directory '*'）
 
               # ① 所有 git 都加 -C "$REPO"，强制在仓库根目录操作
               git -C "$REPO" config user.email "jenkins@yourcorp.local"
