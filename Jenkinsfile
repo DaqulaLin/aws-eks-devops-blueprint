@@ -66,7 +66,14 @@ pipeline {
               git -C "$REPO" add charts/myapp/values-dev.yaml
               git -C "$REPO" commit -m "ci(jenkins): bump dev image.tag -> ${IMAGE_TAG} [skip ci]" || true
 
-              BRANCH=$(git -C "$REPO" rev-parse --abbrev-ref HEAD)
+              
+              # 计算目标分支名：优先 Jenkins 的 BRANCH_NAME；否则取远端默认分支；再兜底 main
+              BR="${BRANCH_NAME:-}"
+              if [ -z "$BR" ] || [ "$BR" = "HEAD" ]; then
+                BR="$(git -C "$REPO" remote show origin | awk "/HEAD branch/ {print \\$NF}")" || true
+              fi
+              : "${BR:=main}"
+              echo "Will push to branch: ${BR}"
 
               # ③ 用 token 改远端并推送（写死仓库 URL 最稳）
               git -C "$REPO" remote set-url origin "https://oauth2:${GIT_PUSH_TOKEN}@gitlab.com/lintime0223/project-eks.git"
