@@ -18,7 +18,12 @@ pipeline {
     GIT_HTTP       = "https://gitlab.com/lintime0223/project-eks.git"  // ←修改为你的
   }
 
+   
   stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
     // ---------- 防环 ----------
     stage('Guard (anti-loop)') {
       steps {
@@ -44,13 +49,7 @@ pipeline {
         }
       }
     }
-  }
-   
-  stages {
-    stage('Checkout') {
-      steps { checkout scm }
-    }
-
+  
     stage('Build & Push (Kaniko)') {
       steps {
         container('kaniko') {
