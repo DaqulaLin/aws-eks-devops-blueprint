@@ -20,9 +20,7 @@ pipeline {
 
    
   stages {
-    //stage('Checkout') {
-    //  steps { checkout scm }
-    //}
+
     stage('Guard (anti-loop)') {
       steps {
         container('tools') {
@@ -59,6 +57,10 @@ pipeline {
       }
     }
   
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
     stage('Build & Push (Kaniko)') {
       steps {
         container('kaniko') {
@@ -122,5 +124,8 @@ pipeline {
     }
   }
 
-  //options { timestamps() }
+  options {
+    skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
+    disableConcurrentBuilds()  
+    //timestamps() }
 }
