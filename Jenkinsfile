@@ -29,21 +29,22 @@ pipeline {
       steps {
         container('tools') {
           script {
-            env.SKIP_BUILD = sh(
-              returnStdout: true,
+            def shouldSkip = (sh(
+              returnStatus: true,
               script: '''
                 set -e
                 REPO="$WORKSPACE"
                 git config --global --add safe.directory "$REPO" || true
                 MSG=$(git -C "$REPO" log -1 --pretty=%B 2>/dev/null || true)
                 AUTHOR=$(git -C "$REPO" log -1 --pretty=%ae 2>/dev/null || true)
-                if echo "$MSG" | grep -Ei '\\[(skip ci|ci skip)\\]' || echo "$AUTHOR" | grep -qi 'jenkins@yourcorp.local'; then
-                  echo 1
-                else
-                  echo 0
-                fi
+
+                # 命中任一条件 => exit 0（表示“应跳过”）；否则 exit 1
+                if echo "$MSG" | grep -Eq '\\[(skip ci|ci skip)\\]'; then exit 0; fi
+                if echo "$AUTHOR" | grep -qi 'jenkins@yourcorp.local'; then exit 0; fi
+                exit 1
               '''
-            ).trim()
+            ) == 0)
+            env.SKIP_BUILD = shouldSkip ? '1' : '0'
             echo "SKIP_BUILD=${env.SKIP_BUILD}"
           }
         }
