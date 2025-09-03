@@ -13,15 +13,36 @@ pipeline {
     ACCOUNT_ID     = credentials('git-push-token') // 可选：若你习惯做成凭据；也可直接写死
     ECR_REGISTRY   = "160885250897.dkr.ecr.us-east-1.amazonaws.com"
     ECR_REPOSITORY = 'myapp'
-    IMAGE_TAG      = "${env.GIT_COMMIT.take(7)}"
+    //IMAGE_TAG      = "${env.GIT_COMMIT.take(7)}"
     // 你的 GitLab 仓库（https 方式）
     GIT_HTTP       = "https://gitlab.com/lintime0223/project-eks.git"  // ←修改为你的
   }
+
 
    
   stages {
     stage('Checkout') {
       steps { checkout scm }
+    }
+
+    stage('Init IMAGE_TAG') {
+      steps {
+        container('tools') {
+          script {
+            env.IMAGE_TAG = sh(
+              script: 'git -C "$WORKSPACE" rev-parse --short=7 HEAD',
+              returnStdout: true
+            ).trim()
+            echo "IMAGE_TAG=${env.IMAGE_TAG}"
+          }
+        }
+      }
+    }
+
+    options {
+      skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
+      disableConcurrentBuilds()  
+      //timestamps() 
     }
 
     stage('Build & Push (Kaniko)') {
@@ -93,9 +114,5 @@ pipeline {
     }
   }
 
-  options {
-    skipDefaultCheckout(true)     // 关闭 Declarative: Checkout SCM
-    disableConcurrentBuilds()  
-    //timestamps() 
-  }
+
 }
