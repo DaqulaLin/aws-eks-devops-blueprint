@@ -20,11 +20,9 @@ pipeline {
 
    
   stages {
-    stage('Checkout') {
-      steps { checkout scm }
-    }
-
-    // ---------- 防环 ----------
+    //stage('Checkout') {
+    //  steps { checkout scm }
+    //}
     stage('Guard (anti-loop)') {
       steps {
         container('tools') {
@@ -35,10 +33,20 @@ pipeline {
                 set -e
                 REPO="$WORKSPACE"
                 git config --global --add safe.directory "$REPO" || true
-                MSG=$(git -C "$REPO" log -1 --pretty=%B 2>/dev/null || true)
-                AUTHOR=$(git -C "$REPO" log -1 --pretty=%ae 2>/dev/null || true)
 
-                # 命中任一条件 => exit 0（表示“应跳过”）；否则 exit 1
+                # 识别目标分支（优先 Jenkins BRANCH_NAME，其次远端默认分支，兜底 main）
+                BR="${BRANCH_NAME:-}"
+                if [ -z "$BR" ] || [ "$BR" = "HEAD" ]; then
+                  BR="$(git -C "$REPO" remote show origin | awk "/HEAD branch/ {print \\$NF}")" || true
+                fi
+                : "${BR:=main}"
+
+                # 拉远端，直接读取 origin/BR 的最新提交（不是本地 HEAD）
+                git -C "$REPO" fetch --no-tags origin "$BR"
+                MSG="$(git -C "$REPO" log -1 --pretty=%B "origin/${BR}" 2>/dev/null || true)"
+                AUTHOR="$(git -C "$REPO" log -1 --pretty=%ae "origin/${BR}" 2>/dev/null || true)"
+
+                # 命中任一条件 => 退出码 0（应跳过），否则 1（继续执行）
                 if echo "$MSG" | grep -Eq '\\[(skip ci|ci skip)\\]'; then exit 0; fi
                 if echo "$AUTHOR" | grep -qi 'jenkins@yourcorp.local'; then exit 0; fi
                 exit 1
