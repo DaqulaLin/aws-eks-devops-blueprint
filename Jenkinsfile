@@ -31,7 +31,7 @@ pipeline {
 
     stage('Init IMAGE_TAG') {
       steps {
-        container('tools') {
+        container('jnlp') {
           script {
             env.IMAGE_TAG = sh(
               script: 'git -C "$WORKSPACE" rev-parse --short=7 HEAD',
