@@ -5,7 +5,7 @@ pipeline {
       cloud 'kubernetes'            // 如果你把 Cloud 重命名成 eks，就写 cloud 'eks'
       // 模板 Name 与 Labels，必须与 Cloud 里的 Pod Template 一致
       inheritFrom 'kaniko-template' // Pod template 的 Name
-      label 'k8s-kaniko'            // Pod template 的 Labels
+      //label 'k8s-kaniko'            // Pod template 的 Labels
       defaultContainer 'jnlp'
     }
   }
