@@ -20,11 +20,7 @@ ingress:
 image:
   tag: 8d21e194
 secret:
-<<<<<<< HEAD
-  name: myapp-secret # 这要与 ExternalSecret.spec.target.name 一致
-=======
   name: myapp-db        # 这要与 ExternalSecret.spec.target.name 一致
->>>>>>> 7c0a68d (update charts)
   inject:
     envFrom: true # 选 true：注入所有 key 为 env
     singleKeys: false # 选 true：只注入示例里的 DB_PASSWORD
