@@ -112,3 +112,11 @@ module "ebs_csi_addon" {
   oidc_issuer  = module.eks.oidc_issuer     # 你的 EKS 模块输出
   tags         = var.tags
 }
+
+
+module "eso_dev_ssm_irsa" {
+  source       = "../../modules/ssm-irsa"
+  cluster_name = module.eks.cluster_name
+  oidc_issuer  = module.eks.oidc_issuer
+
+}
