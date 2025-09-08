@@ -108,7 +108,7 @@ module "jenkins_agent_irsa" {
 module "ebs_csi_addon" {
   source       = "../../modules/ebs-csi-addon"
   cluster_name = module.eks.cluster_name    # 你的 EKS 模块输出
-  k8s_version  = module.eks.cluster_version            # 可选，选个匹配的版本
+  k8s_version  = module.eks.cluster_version # 可选，选个匹配的版本
   oidc_issuer  = module.eks.oidc_issuer     # 你的 EKS 模块输出
   tags         = var.tags
 }

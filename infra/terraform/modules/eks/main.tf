@@ -78,7 +78,7 @@ locals {
     #!/bin/bash
     /etc/eks/bootstrap.sh ${aws_eks_cluster.this.name} \
       --use-max-pods true \
-      --cni-prefix-delegation-enabled ${var.enable_prefix_delegation} }
+      --cni-prefix-delegation-enabled ${var.enable_prefix_delegation} \
     --==BOUNDARY==--
   EOT
 }
