@@ -18,9 +18,6 @@ ingress:
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
     nginx.ingress.kubernetes.io/limit-exempt: "127.0.0.1"
 image:
-<<<<<<< HEAD
-  tag: 0e4faa50
-=======
   tag: 190dda9
 
 secret:
@@ -31,4 +28,3 @@ secret:
     volume: false           # 选 true：以文件方式挂载
   mountPath: /etc/secrets   # 仅当 volume=true 时生效
   reloadOnChange: true     # 你若装了 reloader，可设 true 自动滚动
->>>>>>> 74d525d (update charts)
