@@ -19,7 +19,7 @@ spec:
         {{- if .Values.secret.inject.envFrom }}
         envFrom:
           - secretRef:
-              name: {{ .Values.secret.name | default "myapp-secret" }}
+              name: {{ .Values.secret.name | default "myapp-db" }}
         {{- end }}
         ports:
         - containerPort: {{ .Values.service.targetPort }}
