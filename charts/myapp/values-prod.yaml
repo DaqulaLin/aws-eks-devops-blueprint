@@ -5,4 +5,4 @@ resources:
   requests: { cpu: "150m", memory: "256Mi" }
   limits:   { cpu: "500m", memory: "768Mi" }
 image:
-  tag: 761aa861
+  tag: 
