@@ -19,11 +19,12 @@ ingress:
     nginx.ingress.kubernetes.io/limit-exempt: "127.0.0.1"
 image:
   tag: 44beafae
-#secret:
-#  name: myapp-db        # 这要与 ExternalSecret.spec.target.name 一致
-#  inject:
-#    envFrom: true # 选 true：注入所有 key 为 env
-#    singleKeys: false # 选 true：只注入示例里的 DB_PASSWORD
-#    volume: false # 选 true：以文件方式挂载
-#  mountPath: /etc/secrets # 仅当 volume=true 时生效
-#  reloadOnChange: true # 你若装了 reloader，可设 true 自动滚动
+secret:
+  enabled: false
+  name: myapp-db        # 这要与 ExternalSecret.spec.target.name 一致
+  inject:
+    envFrom: false # 选 true：注入所有 key 为 env
+    singleKeys: false # 选 true：只注入示例里的 DB_PASSWORD
+    volume: false # 选 true：以文件方式挂载
+  mountPath: /etc/secrets # 仅当 volume=true 时生效
+  reloadOnChange: true # 你若装了 reloader，可设 true 自动滚动
