@@ -18,8 +18,7 @@ ingress:
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
     nginx.ingress.kubernetes.io/limit-exempt: "127.0.0.1"
 image:
-  tag: 8d21e194
-
+  tag: 44beafae
 #secret:
 #  name: myapp-db        # 这要与 ExternalSecret.spec.target.name 一致
 #  inject:
