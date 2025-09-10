@@ -18,27 +18,25 @@ ingress:
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
     nginx.ingress.kubernetes.io/limit-exempt: "127.0.0.1"
 image:
-  tag: 44beafae
+  tag: 6d2b9ef4
 secret:
   enabled: false
-  name: myapp-db        # 这要与 ExternalSecret.spec.target.name 一致
+  name: myapp-db # 这要与 ExternalSecret.spec.target.name 一致
   inject:
     envFrom: false # 选 true：注入所有 key 为 env
     singleKeys: false # 选 true：只注入示例里的 DB_PASSWORD
     volume: false # 选 true：以文件方式挂载
   mountPath: /etc/secrets # 仅当 volume=true 时生效
   reloadOnChange: true # 你若装了 reloader，可设 true 自动滚动
-
 rollouts:
   enabled: true
   canary:
     steps:
       - setWeight: 10
-      - pause: { duration: 120 }           # 等 2 分钟观察
-      - analysis: { templates: ["myapp-success-rate"] }
+      - pause: {duration: 120} # 等 2 分钟观察
+      - analysis: {templates: ["myapp-success-rate"]}
       - setWeight: 30
-      - pause: { duration: 180 }
+      - pause: {duration: 180}
       - setWeight: 50
-      - pause: {}                          # 人工确认点（无限暂停）
-    header: "X-Canary"                      # 可选：带此 Header 命中金丝雀
-
+      - pause: {} # 人工确认点（无限暂停）
+    header: "X-Canary" # 可选：带此 Header 命中金丝雀
