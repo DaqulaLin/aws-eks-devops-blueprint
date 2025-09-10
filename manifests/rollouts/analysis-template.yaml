@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: myapp-success-rate
+  namespace: dev
+spec:
+  metrics:
+  - name: error-rate
+    interval: 30s
+    count: 4                      # 连续 4 次（2 分钟内）都要通过
+    successCondition: result < 0.01
+    failureCondition: result >= 0.01
+    provider:
+      prometheus:
+        address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          sum(rate(nginx_ingress_controller_requests{ingress="{{ include "myapp.fullname" . }}",status=~"5.."}[1m]))
+          /
+          sum(rate(nginx_ingress_controller_requests{ingress="{{ include "myapp.fullname" . }}"}[1m]))

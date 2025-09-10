@@ -1,0 +1,14 @@
+{{- if .Values.rollouts.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "myapp.fullname" . }}-canary
+  labels: {{- include "myapp.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPort }}
+    name: http
+  selector: {{- include "myapp.selectorLabels" . | nindent 4 }}
+{{- end }}

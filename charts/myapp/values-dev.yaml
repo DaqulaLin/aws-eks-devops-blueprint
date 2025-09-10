@@ -28,3 +28,17 @@ secret:
     volume: false # 选 true：以文件方式挂载
   mountPath: /etc/secrets # 仅当 volume=true 时生效
   reloadOnChange: true # 你若装了 reloader，可设 true 自动滚动
+
+rollouts:
+  enabled: true
+  canary:
+    steps:
+      - setWeight: 10
+      - pause: { duration: 120 }           # 等 2 分钟观察
+      - analysis: { templates: ["myapp-success-rate"] }
+      - setWeight: 30
+      - pause: { duration: 180 }
+      - setWeight: 50
+      - pause: {}                          # 人工确认点（无限暂停）
+    header: "X-Canary"                      # 可选：带此 Header 命中金丝雀
+
