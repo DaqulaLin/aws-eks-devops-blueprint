@@ -3,20 +3,21 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "myapp.fullname" . }}
+  labels: {{- include "myapp.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
-    apiVersion: {{- if .Values.rollouts.enabled }} argoproj.io/v1alpha1 {{- else }} apps/v1 {{- end }}
-    kind:      {{- if .Values.rollouts.enabled }} Rollout {{- else }} Deployment {{- end }}
+    apiVersion: {{ if .Values.rollouts.enabled }}argoproj.io/v1alpha1{{ else }}apps/v1{{ end }}
+    kind:        {{ if .Values.rollouts.enabled }}Rollout{{ else }}Deployment{{ end }}
     name: {{ include "myapp.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
 {{- end }}
 
 
