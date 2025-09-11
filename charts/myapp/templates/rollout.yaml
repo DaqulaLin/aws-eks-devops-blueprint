@@ -17,15 +17,17 @@ spec:
           stableIngress: {{ include "myapp.fullname" . }}
       steps:
         - setWeight: 10
-        - pause: { duration: 60 }
+        - pause: { duration: 120 }
         - analysis:
             templates:
               - templateName: myapp-success-rate
                 arguments:
                   - name: ingress
-                    value: {{ include "myapp.fullname" . }}
+                    value: {{ include "myapp.fullname" . | quote }}
         - setWeight: 30
-        - pause: { duration: 120 }
+        - pause: { duration: 180 }
+        - setWeight: 50
+        - pause: { }
   template:
     metadata:
       labels: {{- include "myapp.selectorLabels" . | nindent 8 }}
