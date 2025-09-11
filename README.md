@@ -123,6 +123,15 @@ project-eks/
 ```
 
 ---
+### Configuration
+
+Copy the example and adjust values for your environment:
+
+```bash
+cp infra/terraform/terraform.tfvars.example infra/terraform/terraform.tfvars
+
+```
+---
 
 ## Quick Start
 
@@ -161,6 +170,22 @@ helm repo add argo https://argoproj.github.io/argo-helm
 helm upgrade --install argocd argo/argo-cd -n argocd --set server.insecure=true
 kubectl -n argocd apply -f manifests/argocd/root.yaml
 ```
+
+---
+### Makefile entry points
+
+Run from the repository root:
+
+- `make tf-init`        — Terraform init (remote state + providers)
+- `make tf-plan`        — Terraform plan
+- `make tf-apply`       — Create VPC/EKS/ECR (auto-approve)
+- `make kubeconfig`     — Update kubeconfig from Terraform outputs
+- `make addons`         — Install metrics-server + ingress-nginx
+- `make argocd-bootstrap` — Install Argo CD and apply the root app
+- `make ci-dryrun`      — Helm template sanity check (values-<env>.yaml)
+- `make tf-destroy`     — Destroy infra (ensure ELB/ENI/NAT are gone)
+
+Tip: `make help` prints all available targets.
 
 ---
 
