@@ -373,14 +373,27 @@ cd infra/terraform && terraform destroy -auto-approve
 
 **Reproduce:** `kubectl argo rollouts get rollout myapp-dev -n dev --watch`
 
-**Embed:**
-
-
 ![Argo Rollouts — Canary (CLI)](docs/screenshots/rollouts-canary-cli.png)
 
+---
 
+### CI Evidence (GitLab)
 
-> **Note:** If your screenshot includes AWS account IDs or registry URIs, consider masking them before committing the image to a public repo.
+> Why include: demonstrates the **secondary CI pipeline** beyond GitHub Actions — builder runs on EKS runner, bumps image tag and pushes to ECR via short‑lived creds.
+
+* **Pipelines overview** — recent pipeline outcomes (success/fail), duration, stages:
+
+![GitLab — Pipelines Overview](docs/screenshots/gitlab-pipelines.png)
+
+* **Job log (build & bump)** — runner steps (apk add, AWS login to ECR, docker build/push, values bump commit):
+
+![GitLab — Job Log](docs/screenshots/gitlab-job-log.png)
+
+* *(Optional)* **Jobs list** — consolidated view of recent jobs:
+
+![GitLab — Jobs List](docs/screenshots/gitlab-jobs.png)
+
+> **Privacy note:** Before committing images to a public repo, mask account IDs, registry URIs, and any tokens or internal hostnames.
 
 ---
 
