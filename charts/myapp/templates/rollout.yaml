@@ -5,38 +5,46 @@ metadata:
   name: {{ include "myapp.fullname" . }}
   labels: {{- include "myapp.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount | default 2 }}
+  selector:
+    matchLabels: {{- include "myapp.selectorLabels" . | nindent 6 }}
   strategy:
     canary:
       canaryService: {{ include "myapp.fullname" . }}-canary
       stableService: {{ include "myapp.fullname" . }}
       trafficRouting:
         nginx:
-          stableIngress: {{ include "myapp.fullname" . }}   # 由 Rollouts 自动创建/管理 canary ingress
-          additionalIngressAnnotations:
-            nginx.ingress.kubernetes.io/canary-by-header: "{{ .Values.rollouts.canary.header }}"
+          stableIngress: {{ include "myapp.fullname" . }}
       steps:
-{{- toYaml .Values.rollouts.canary.steps | nindent 8 }}
-  selector:
-    matchLabels: {{- include "myapp.selectorLabels" . | nindent 6 }}
+        - setWeight: 10
+        - pause: { duration: 60 }
+        - analysis:
+            templates:
+              - templateName: myapp-success-rate
+                arguments:
+                  - name: ingress
+                    value: {{ include "myapp.fullname" . }}
+        - setWeight: 30
+        - pause: { duration: 120 }
   template:
     metadata:
       labels: {{- include "myapp.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - name: myapp
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - containerPort: {{ .Values.service.targetPort }}
-          name: http
-        readinessProbe:
-          httpGet: { path: /, port: http }
-          initialDelaySeconds: 3
-          periodSeconds: 5
-        livenessProbe:
-          httpGet: { path: /, port: http }
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        resources: {{- toYaml .Values.resources | nindent 10 }}
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort | default 80 }}
+          readinessProbe:
+            httpGet: { path: /, port: http }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
 {{- end }}
