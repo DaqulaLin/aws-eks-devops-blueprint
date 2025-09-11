@@ -389,12 +389,6 @@ cd infra/terraform && terraform destroy -auto-approve
 
 ![GitLab — Job Log](docs/screenshots/gitlab-job-log.png)
 
-* *(Optional)* **Jobs list** — consolidated view of recent jobs:
-
-![GitLab — Jobs List](docs/screenshots/gitlab-jobs.png)
-
-> **Privacy note:** Before committing images to a public repo, mask account IDs, registry URIs, and any tokens or internal hostnames.
-
 ---
 
 ## License
