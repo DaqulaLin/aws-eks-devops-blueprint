@@ -367,6 +367,27 @@ cd infra/terraform && terraform destroy -auto-approve
 
 ---
 
+## Screenshots
+
+> Argo Rollouts — Canary (CLI) paused at 30% with analysis runs
+
+**Reproduce:** `kubectl argo rollouts get rollout myapp-dev -n dev --watch`
+
+**Embed:**
+
+```md
+![Argo Rollouts — Canary (CLI)](docs/screenshots/rollouts-canary-cli.png)
+```
+
+> **Note:** If your screenshot includes AWS account IDs or registry URIs, consider masking them before committing the image to a public repo.
+
+---
+
 ## License
 
-MIT (adjust as needed).
+MIT License
+
+Copyright (c) 2025 ...
+
+Permission is hereby granted, free of charge, to any person obtaining a copy...
+
