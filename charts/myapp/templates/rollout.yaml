@@ -21,9 +21,9 @@ spec:
         - analysis:
             templates:
               - templateName: myapp-success-rate
-                args:
-                  - name: ingress
-                    value: {{ include "myapp.fullname" . | quote }}
+            args:
+              - name: ingress
+                value: {{ include "myapp.fullname" . | quote }}
         - setWeight: 30
         - pause: { duration: 180 }
         - setWeight: 50
