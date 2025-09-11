@@ -1,0 +1,20 @@
+project_name = "project-eks"
+env          = "dev"
+aws_region   = "us-east-1"
+
+vpc_cidr        = "10.10.0.0/16"
+public_subnets  = ["10.10.1.0/24", "10.10.2.0/24"]
+private_subnets = ["10.10.11.0/24", "10.10.12.0/24"]
+
+eks_version         = "1.32"
+node_instance_types = ["t3.small"]
+node_desired_size   = 2
+node_min_size       = 1
+create_ecr          = true
+ecr_repo_name       = "myapp"
+
+enable_prefix_delegation = false
+enable_vpc_cni_addon     = false
+
+
+oidc_provider_arn = "arn:aws:iam::*******:oidc-provider/token.actions.githubusercontent.com"

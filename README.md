@@ -178,7 +178,7 @@ kind: Application
 metadata: { name: root, namespace: argocd }
 spec:
   source:
-    repoURL: https://github.com/<you>/project-eks.git
+    repoURL: repoURL: https://github.com/DaqulaLin/aws-eks-devops-blueprint
     path: manifests/apps
     targetRevision: main
   destination: { server: https://kubernetes.default.svc, namespace: argocd }
