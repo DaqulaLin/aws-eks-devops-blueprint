@@ -375,9 +375,10 @@ cd infra/terraform && terraform destroy -auto-approve
 
 **Embed:**
 
-```md
+
 ![Argo Rollouts — Canary (CLI)](docs/screenshots/rollouts-canary-cli.png)
-```
+
+
 
 > **Note:** If your screenshot includes AWS account IDs or registry URIs, consider masking them before committing the image to a public repo.
 
